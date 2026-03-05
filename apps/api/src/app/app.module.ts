@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CurrencyModule } from '../currency/currency.module';
+import { ChannelModule } from '../channel/channel.module';
 import { SeedModule } from '../seed/seed.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { SeedModule } from '../seed/seed.module';
       synchronize: true,
     }),
     CurrencyModule,
+    ChannelModule,
     SeedModule,
   ],
   controllers: [AppController],

@@ -28,6 +28,8 @@ docker-compose down        # Stop MySQL
 - Single shared `package.json` (Nx monorepo pattern)
 - Test runner: Vitest for both API and Web
 - Package manager: pnpm
+- No hardcoded values: use enums for fixed sets (e.g., `EngagementRank`, `CampaignGoal`) and constants for magic numbers (e.g., `FREQUENCY_CAP`)
+- `.http` test files live inside each module folder (e.g., `src/currency/currency.http`)
 
 ## Database
 
