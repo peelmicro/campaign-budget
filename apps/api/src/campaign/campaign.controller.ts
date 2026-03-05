@@ -42,6 +42,11 @@ export class CampaignController {
     return this.campaignService.update(id, dto);
   }
 
+  @Post(':id/distribute')
+  redistribute(@Param('id', ParseIntPipe) id: number): Promise<Campaign> {
+    return this.campaignService.redistribute(id);
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {

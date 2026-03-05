@@ -27,6 +27,7 @@ const mockCampaignService = {
   create: vi.fn(),
   update: vi.fn(),
   remove: vi.fn(),
+  redistribute: vi.fn(),
 };
 
 describe('CampaignController', () => {
@@ -100,6 +101,16 @@ describe('CampaignController', () => {
       expect(mockCampaignService.update).toHaveBeenCalledWith(1, {
         budget: 20000,
       });
+    });
+  });
+
+  describe('redistribute', () => {
+    it('should call redistribute and return the campaign', async () => {
+      mockCampaignService.redistribute.mockResolvedValue(mockCampaign);
+
+      const result = await controller.redistribute(1);
+      expect(result).toEqual(mockCampaign);
+      expect(mockCampaignService.redistribute).toHaveBeenCalledWith(1);
     });
   });
 

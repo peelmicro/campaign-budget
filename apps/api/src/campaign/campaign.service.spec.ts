@@ -4,6 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
 import { Campaign } from './campaign.entity';
 import { CampaignGoal } from './campaign-goal.enum';
+import { DistributionService } from '../distribution/distribution.service';
 
 const mockCampaign: Partial<Campaign> = {
   id: 1,
@@ -31,6 +32,10 @@ const mockRepository = {
   remove: vi.fn(),
 };
 
+const mockDistributionService = {
+  distribute: vi.fn().mockResolvedValue([]),
+};
+
 describe('CampaignService', () => {
   let service: CampaignService;
 
@@ -41,6 +46,7 @@ describe('CampaignService', () => {
       providers: [
         CampaignService,
         { provide: getRepositoryToken(Campaign), useValue: mockRepository },
+        { provide: DistributionService, useValue: mockDistributionService },
       ],
     }).compile();
 
@@ -70,7 +76,7 @@ describe('CampaignService', () => {
   });
 
   describe('create', () => {
-    it('should create and return a campaign', async () => {
+    it('should create a campaign and call distribute', async () => {
       const dto = {
         code: 'CAMP-001',
         clientName: 'Acme Corp',
@@ -84,16 +90,18 @@ describe('CampaignService', () => {
       };
       mockRepository.create.mockReturnValue(mockCampaign);
       mockRepository.save.mockResolvedValue(mockCampaign);
+      mockRepository.findOneBy.mockResolvedValue(mockCampaign);
 
       const result = await service.create(dto);
       expect(result).toEqual(mockCampaign);
       expect(mockRepository.create).toHaveBeenCalledWith(dto);
       expect(mockRepository.save).toHaveBeenCalledWith(mockCampaign);
+      expect(mockDistributionService.distribute).toHaveBeenCalledWith(mockCampaign);
     });
   });
 
   describe('update', () => {
-    it('should update and return the campaign', async () => {
+    it('should update the campaign and call distribute', async () => {
       const updated = { ...mockCampaign, budget: 20000 };
       mockRepository.findOneBy.mockResolvedValue({ ...mockCampaign });
       mockRepository.save.mockResolvedValue(updated);
@@ -101,6 +109,7 @@ describe('CampaignService', () => {
       const result = await service.update(1, { budget: 20000 });
       expect(result).toEqual(updated);
       expect(mockRepository.save).toHaveBeenCalled();
+      expect(mockDistributionService.distribute).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when updating non-existent campaign', async () => {
@@ -108,6 +117,21 @@ describe('CampaignService', () => {
       await expect(service.update(999, { budget: 20000 })).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('redistribute', () => {
+    it('should call distribute and return the campaign', async () => {
+      mockRepository.findOneBy.mockResolvedValue(mockCampaign);
+
+      const result = await service.redistribute(1);
+      expect(result).toEqual(mockCampaign);
+      expect(mockDistributionService.distribute).toHaveBeenCalledWith(mockCampaign);
+    });
+
+    it('should throw NotFoundException for non-existent campaign', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+      await expect(service.redistribute(999)).rejects.toThrow(NotFoundException);
     });
   });
 

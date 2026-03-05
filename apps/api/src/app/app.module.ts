@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { CurrencyModule } from '../currency/currency.module';
 import { ChannelModule } from '../channel/channel.module';
 import { CampaignModule } from '../campaign/campaign.module';
+import { DistributionModule } from '../distribution/distribution.module';
 import { SeedModule } from '../seed/seed.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { SeedModule } from '../seed/seed.module';
     CurrencyModule,
     ChannelModule,
     CampaignModule,
+    DistributionModule,
     SeedModule,
   ],
   controllers: [AppController],
