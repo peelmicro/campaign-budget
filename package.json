@@ -2,7 +2,18 @@
   "name": "@campaign-budget/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "api": "pnpm nx serve api",
+    "api:test": "pnpm nx test api",
+    "api:lint": "pnpm nx lint api",
+    "web": "pnpm nx serve web",
+    "web:test": "pnpm nx test web",
+    "web:lint": "pnpm nx lint web",
+    "dc:up": "docker-compose up -d",
+    "dc:down": "docker-compose down",
+    "dc:ps": "docker-compose ps",
+    "dc:clean": "docker-compose down -v"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~21.1.0",
@@ -14,8 +25,11 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.0",
+    "mysql2": "^3.18.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@angular-devkit/core": "~21.1.0",
@@ -33,6 +47,8 @@
     "@nx/js": "22.5.3",
     "@nx/nest": "22.5.3",
     "@nx/node": "22.5.3",
+    "@nx/vite": "^22.5.4",
+    "@nx/vitest": "^22.5.4",
     "@nx/web": "22.5.3",
     "@nx/webpack": "22.5.3",
     "@nx/workspace": "22.5.3",
@@ -51,6 +67,7 @@
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
+    "unplugin-swc": "^1.5.9",
     "vitest": "^4.0.8",
     "webpack-cli": "^5.1.4"
   },

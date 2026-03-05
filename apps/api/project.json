@@ -43,6 +43,14 @@
       "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
       "executor": "nx:noop"
     },
+    "test": {
+      "executor": "@nx/vitest:test",
+      "outputs": ["{projectRoot}/test-output/vitest/coverage"],
+      "options": {
+        "config": "apps/api/vite.config.ts",
+        "passWithNoTests": true
+      }
+    },
     "serve": {
       "continuous": true,
       "executor": "@nx/js:node",
