@@ -10,8 +10,8 @@ import { FREQUENCY_CAP } from './constants';
 
 const mockChannels: Partial<Channel>[] = [
   { id: 1, code: 'VIDEO', cpm: 15.0, engagementRank: EngagementRank.HIGH },
-  { id: 2, code: 'DISPLAY', cpm: 3.0, engagementRank: EngagementRank.MEDIUM },
-  { id: 3, code: 'SOCIAL', cpm: 10.0, engagementRank: EngagementRank.LOW },
+  { id: 2, code: 'DISPLAY', cpm: 10.0, engagementRank: EngagementRank.MEDIUM },
+  { id: 3, code: 'SOCIAL', cpm: 3.0, engagementRank: EngagementRank.LOW },
 ];
 
 const baseCampaign: Partial<Campaign> = {
@@ -54,23 +54,23 @@ describe('DistributionService', () => {
     it('REACH: should weight by inverse CPM (cheaper gets more)', () => {
       const weights = service.calculateWeights(mockChannels as Channel[], CampaignGoal.REACH);
 
-      // inverseCPM: Video=1/15=0.0667, Display=1/3=0.3333, Social=1/10=0.1
+      // inverseCPM: Video=1/15=0.0667, Display=1/10=0.1, Social=1/3=0.3333
       // sum = 0.5
-      // Video: 0.0667/0.5 = 0.1333, Display: 0.3333/0.5 = 0.6667, Social: 0.1/0.5 = 0.2
+      // Video: 0.0667/0.5 = 0.1333, Display: 0.1/0.5 = 0.2, Social: 0.3333/0.5 = 0.6667
       expect(weights[0]).toBeCloseTo(0.1333, 3); // Video (most expensive, least weight)
-      expect(weights[1]).toBeCloseTo(0.6667, 3); // Display (cheapest, most weight)
-      expect(weights[2]).toBeCloseTo(0.2, 3);    // Social
+      expect(weights[1]).toBeCloseTo(0.2, 3);    // Display
+      expect(weights[2]).toBeCloseTo(0.6667, 3); // Social (cheapest, most weight)
       expect(weights.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 10);
     });
 
     it('ENGAGEMENT: should weight by CPM (expensive gets more)', () => {
       const weights = service.calculateWeights(mockChannels as Channel[], CampaignGoal.ENGAGEMENT);
 
-      // CPM sum = 15 + 3 + 10 = 28
-      // Video: 15/28 = 0.5357, Display: 3/28 = 0.1071, Social: 10/28 = 0.3571
+      // CPM sum = 15 + 10 + 3 = 28
+      // Video: 15/28 = 0.5357, Display: 10/28 = 0.3571, Social: 3/28 = 0.1071
       expect(weights[0]).toBeCloseTo(0.5357, 3); // Video (most expensive, most weight)
-      expect(weights[1]).toBeCloseTo(0.1071, 3); // Display (cheapest, least weight)
-      expect(weights[2]).toBeCloseTo(0.3571, 3); // Social
+      expect(weights[1]).toBeCloseTo(0.3571, 3); // Display
+      expect(weights[2]).toBeCloseTo(0.1071, 3); // Social (cheapest, least weight)
       expect(weights.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 10);
     });
 
@@ -95,9 +95,9 @@ describe('DistributionService', () => {
       const display = result.find((r) => r.channelId === 2);
       const social = result.find((r) => r.channelId === 3);
 
-      // Display (cheapest) should get the most budget
-      expect(Number(display.allocatedBudget)).toBeGreaterThan(Number(social.allocatedBudget));
-      expect(Number(social.allocatedBudget)).toBeGreaterThan(Number(video.allocatedBudget));
+      // Social (cheapest at $3) should get the most budget
+      expect(Number(social.allocatedBudget)).toBeGreaterThan(Number(display.allocatedBudget));
+      expect(Number(display.allocatedBudget)).toBeGreaterThan(Number(video.allocatedBudget));
     });
 
     it('ENGAGEMENT: should allocate more budget to expensive channels', async () => {
@@ -108,9 +108,9 @@ describe('DistributionService', () => {
       const display = result.find((r) => r.channelId === 2);
       const social = result.find((r) => r.channelId === 3);
 
-      // Video (most expensive) should get the most budget
-      expect(Number(video.allocatedBudget)).toBeGreaterThan(Number(social.allocatedBudget));
-      expect(Number(social.allocatedBudget)).toBeGreaterThan(Number(display.allocatedBudget));
+      // Video (most expensive at $15) should get the most budget
+      expect(Number(video.allocatedBudget)).toBeGreaterThan(Number(display.allocatedBudget));
+      expect(Number(display.allocatedBudget)).toBeGreaterThan(Number(social.allocatedBudget));
     });
 
     it('BALANCED: should allocate budget equally', async () => {

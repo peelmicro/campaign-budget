@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { Currency } from '../currency/currency.entity';
 import { Channel } from '../channel/channel.entity';
 import { EngagementRank } from '../channel/engagement-rank.enum';
+import { CampaignService } from '../campaign/campaign.service';
+import { Campaign } from '../campaign/campaign.entity';
+import { CampaignGoal } from '../campaign/campaign-goal.enum';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -14,11 +17,15 @@ export class SeedService implements OnModuleInit {
     private readonly currencyRepository: Repository<Currency>,
     @InjectRepository(Channel)
     private readonly channelRepository: Repository<Channel>,
+    @InjectRepository(Campaign)
+    private readonly campaignRepository: Repository<Campaign>,
+    private readonly campaignService: CampaignService,
   ) {}
 
   async onModuleInit(): Promise<void> {
     await this.seedCurrencies();
     await this.seedChannels();
+    await this.seedCampaigns();
   }
 
   private async seedCurrencies(): Promise<void> {
@@ -62,14 +69,14 @@ export class SeedService implements OnModuleInit {
       {
         code: 'DISPLAY',
         description: 'Display Ads',
-        cpm: 3.0,
+        cpm: 10.0,
         currencyId: usd.id,
         engagementRank: EngagementRank.MEDIUM,
       },
       {
         code: 'SOCIAL',
         description: 'Social Media Ads',
-        cpm: 10.0,
+        cpm: 3.0,
         currencyId: usd.id,
         engagementRank: EngagementRank.LOW,
       },
@@ -77,5 +84,61 @@ export class SeedService implements OnModuleInit {
 
     await this.channelRepository.save(channels);
     this.logger.log(`Seeded ${channels.length} channels.`);
+  }
+
+  private async seedCampaigns(): Promise<void> {
+    const count = await this.campaignRepository.count();
+    if (count > 0) {
+      this.logger.log('Campaigns already seeded, skipping.');
+      return;
+    }
+
+    const usd = await this.currencyRepository.findOneBy({ code: 'USD' });
+    const eur = await this.currencyRepository.findOneBy({ code: 'EUR' });
+    if (!usd || !eur) {
+      this.logger.warn('Currencies not found, skipping campaign seed.');
+      return;
+    }
+
+    const campaigns = [
+      {
+        code: 'SUMMER-2026',
+        clientName: 'Acme Corp',
+        managerName: 'Alice Johnson',
+        budget: 50000,
+        currencyId: usd.id,
+        days: 30,
+        fromDate: '2026-06-01',
+        toDate: '2026-06-30',
+        goal: CampaignGoal.REACH,
+      },
+      {
+        code: 'LAUNCH-Q3',
+        clientName: 'Globex Inc',
+        managerName: 'Bob Smith',
+        budget: 120000,
+        currencyId: eur.id,
+        days: 14,
+        fromDate: '2026-07-01',
+        toDate: '2026-07-14',
+        goal: CampaignGoal.ENGAGEMENT,
+      },
+      {
+        code: 'BRAND-AWARENESS',
+        clientName: 'Initech Ltd',
+        managerName: 'Carol Davis',
+        budget: 75000,
+        currencyId: usd.id,
+        days: 21,
+        fromDate: '2026-08-01',
+        toDate: '2026-08-21',
+        goal: CampaignGoal.BALANCED,
+      },
+    ];
+
+    for (const dto of campaigns) {
+      await this.campaignService.create(dto);
+    }
+    this.logger.log(`Seeded ${campaigns.length} demo campaigns.`);
   }
 }

@@ -12,7 +12,9 @@
     "dc:up": "docker-compose up -d",
     "dc:down": "docker-compose down",
     "dc:ps": "docker-compose ps",
-    "dc:clean": "docker-compose down -v"
+    "dc:clean": "docker-compose down -v",
+    "dc:build": "docker-compose build",
+    "dc:up:all": "docker-compose up --build -d"
   },
   "private": true,
   "dependencies": {
