@@ -9,7 +9,7 @@
     "web": "pnpm nx serve web",
     "web:test": "pnpm nx test web",
     "web:lint": "pnpm nx lint web",
-    "dc:up": "docker-compose up -d",
+    "dc:up": "docker-compose up -d mysql",
     "dc:down": "docker-compose down",
     "dc:ps": "docker-compose ps",
     "dc:clean": "docker-compose down -v",
