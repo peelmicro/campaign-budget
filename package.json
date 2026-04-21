@@ -14,7 +14,11 @@
     "dc:ps": "docker-compose ps",
     "dc:clean": "docker-compose down -v",
     "dc:build": "docker-compose build",
-    "dc:up:all": "docker-compose up --build -d"
+    "dc:up:all": "docker-compose up --build -d",
+    "dc:logs:mysql": "docker-compose logs -f mysql",
+    "dc:logs:api": "docker-compose logs -f api",
+    "dc:logs:web": "docker-compose logs -f web",
+    "dc:logs:all": "docker-compose logs -f"
   },
   "private": true,
   "dependencies": {
